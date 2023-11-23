@@ -1,15 +1,16 @@
 #pragma once // program znajdzię się tylko w jednej kompilacji
 #include <ncursesw/curses.h>
 #include "Draw.hpp"
+#include "Ticks.hpp"
 
 class Square{
 public:
 	Square(){
-		parameters(0, 0);  //default
+		parameters(0, 0, 300);  //default
 	}
 	
-	Square(int height, int width){
-		parameters(height, width);
+	Square(int height, int width, int speed){
+		parameters(height, width, speed);
 	}
 
 	void drawsquare(){
@@ -30,7 +31,20 @@ public:
 	}
 	
 	chtype getinput(){
-		return wgetch(win);  //nazwy mówią same za siebie, więc zwrócę w komentarzu uwagę na brzydotę tej biblioteki. Kto uznał, że wgetch brzmi dobrze?
+		time_t time_last_input = Time::milliseconds();
+		
+		chtype input = wgetch(win);
+		chtype new_input = ERR;
+		
+		settimeout(0);
+		while(time_last_input + timeout >= Time::milliseconds()){
+			new_input = wgetch(win);
+		}
+		settimeout(timeout);
+		if(new_input != ERR)
+			input = new_input;
+			
+		return input;
 	}
 	
 	void getcoordinates(int &y, int &x){
@@ -50,8 +64,8 @@ public:
 		wrefresh(win);
 	}
 	
-	void settimeout(int timeout){
-		wtimeout(win, timeout);
+	void settimeout(int speed){
+		wtimeout(win, speed);   // automatyczne odświeżanie się ekranu / prędkość gry
 	}
 	
 	int getstartrow(){
@@ -62,11 +76,20 @@ public:
 		return startcol;
 	}
 	
+	int gettimeout(){
+		return timeout;
+	}
+	
+	void changetimeout(int speed){
+		timeout = speed;
+	}
+	
 private:
 	WINDOW *win;
 	int height, width, startrow, startcol;
+	int timeout;
 	
-	void parameters(int height, int width){
+	void parameters(int height, int width, int speed){
 		int xres, yres;
 		getmaxyx(stdscr, yres, xres);
 		this->height = height;  
@@ -76,8 +99,9 @@ private:
 		startcol = (xres / 2) - (width / 2);
 		
 		win = newwin(height, width, startrow, startcol);
-		// automatyczne odświeżanie się ekranu / prędkość gry
-		wtimeout(win, 300);
+		
+		timeout = speed;
+		settimeout(speed);
 		// strzałki są wyłączone by default
 		keypad(win, true);
 	}

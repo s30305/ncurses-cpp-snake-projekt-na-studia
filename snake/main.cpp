@@ -18,6 +18,7 @@ int main(int argc, char **argv){
 	curs_set(0);
 	skok:;
 	Game game(height, width, hs);
+	
 	while(!game.isover()){
 		game.useinput();
 		
@@ -26,6 +27,7 @@ int main(int argc, char **argv){
 		game.redraw();
 		
 	}
+	
 	if(hs < game.getscore())
 		hs = game.getscore();
 	if (!game.isexit())

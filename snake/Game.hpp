@@ -31,7 +31,7 @@ class Game{
 					destroyapple();
 					break;
 				case ' ':
-					{          // nie mogę deklarować zmiennych w switchu bez klamerek ???
+					{
 					int emptyrow = snake.tail().gety();
 					int emptycol = snake.tail().getx();
 					square.add(Empty(emptyrow, emptycol));
@@ -50,14 +50,15 @@ class Game{
 	void destroyapple(){
 		delete apple;
 		apple = NULL;
-		
 		score += 1;
+		if ((square.gettimeout() > 50))
+			square.changetimeout(square.gettimeout() - 5);
 		scoreboard.updatescore(score);
 	}
 	
 public:
-	Game(int height, int width, int hs){
-		square = Square(height, width);
+	Game(int height, int width, int hs, int speed = 200){
+		square = Square(height, width, speed);
 		int sbrow = square.getstartrow() + height;
 		int sbcol = square.getstartcol();
 		scoreboard = Scoreboard(width, sbrow, sbcol);
@@ -92,6 +93,8 @@ public:
 	void useinput(){
 		chtype input = square.getinput();
 		
+		int old_timeout = square.gettimeout();
+		
 		switch(input){
 			case KEY_UP:
 			case 'w':
@@ -117,7 +120,7 @@ public:
 				square.settimeout(-1);
 				while(square.getinput() != 'p')
 					;
-				square.settimeout(300);
+				square.settimeout(old_timeout);
 				break;
 			
 			case 'x':
