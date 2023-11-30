@@ -11,14 +11,28 @@
 
 int main(int argc, char **argv){
 	int hs = 0;
+	int x;
+	bool obstacle = false;
+	a:;
+	std::cout << "Press 1 to select plain gamemode" << std::endl << "Press 2 to select obstacle gamemode" << std::endl;
+	std::cin >> x; 
+	if (x==1)
+		obstacle = false;
+	else if (x==2)
+		obstacle = true;
+	else{
+		std::cout << "Invalid input, retry" << std::endl;
+		goto a;
+	}
+	
+	
 	initscr();
 	refresh();
-	
 	noecho();
 	curs_set(0);
-	skok:;
-	Game game(height, width, hs);
 	
+	skok:;
+	Game game(height, width, hs, obstacle);
 	while(!game.isover()){
 		game.useinput();
 		
