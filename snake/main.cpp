@@ -5,24 +5,28 @@
 #include "Draw.hpp"
 
 //boję się wkładać polskie znaczki w kod, a polski bez znaczków to herezja thus wszystko po angielsku
-#define squaresize 16
-#define height squaresize
-#define width squaresize * 2
-
 int main(int argc, char **argv){
+	int height = 16;
+	int width = height*2;
 	int hs = 0;
 	int x;
-	bool obstacle = false;
+	bool plus = false;
+	bool vase = false;
 	a:;
-	std::cout << "Press 1 to select plain gamemode" << std::endl << "Press 2 to select obstacle gamemode" << std::endl;
+	std::cout << "Press 1 to select plain gamemode" << std::endl << "Press 2 to select + gamemode" << std::endl << "Press 3 to select vase gamemode" << std::endl;
 	std::cin >> x; 
-	if (x==1)
-		obstacle = false;
-	else if (x==2)
-		obstacle = true;
-	else{
-		std::cout << "Invalid input, retry" << std::endl;
-		goto a;
+	switch(x){
+		case 1:
+			break;
+		case 2:
+			plus = true;
+			break;
+		case 3:
+			vase = true;
+			break;
+		default:
+			std::cout << "Invalid input, retry" << std::endl;
+			goto a;
 	}
 	
 	
@@ -32,7 +36,7 @@ int main(int argc, char **argv){
 	curs_set(0);
 	
 	skok:;
-	Game game(height, width, hs, obstacle);
+	Game game(height, width, hs, plus, vase);
 	while(!game.isover()){
 		game.useinput();
 		

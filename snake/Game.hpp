@@ -57,16 +57,16 @@ class Game{
 	}
 	
 public:
-	Game(int height, int width, int hs, bool o, int speed = 200){
+	Game(int height, int width, int hs, bool p, bool v, int speed = 200){
 		square = Square(height, width, speed);
 		int sbrow = square.getstartrow() + height;
 		int sbcol = square.getstartcol();
 		scoreboard = Scoreboard(width, sbrow, sbcol);
 		highscore = hs;
-		initialize(o);
+		initialize(p, v);
 	}
 	
-	void initialize(bool o){
+	void initialize(bool plus, bool vase){
 		apple = NULL;
 		square.drawsquare();
 		
@@ -84,12 +84,20 @@ public:
 		for(int i=0; i<3; i++)
 			createnextpiece(snake.nexthead());
 			
-		if(o){
+		if(plus){
+			for(int i = 1; i!=8; i++)
+				square.addsign(7, 11 + i, '%');
+			for(int i = 1; i!=6; i++)
+				square.addsign(4 + i, 15, '%');
+		}
+		
+		if(vase){
 			for(int i = 1; i!=7; i++)
-				square.addsign(4 + i, 7 + i, '%');
-				
+				square.addsign(3 + i, 7 + i, '%');		
 			for(int i = 1; i!=7; i++)
-				square.addsign(4 + i, 25, '%');
+				square.addsign(3 + i, 25, '%');
+			for(int i = 1; i!=13; i++)
+				square.addsign(12, 13 + i, '%');
 			
 		}
 		
