@@ -57,12 +57,11 @@ class Game{
 	}
 	
 public:
-	Game(int height, int width, int hs, bool p, bool v, int speed = 200){
+	Game(int height, int width, int hs, bool p, bool v, int speed = 200) :highscore(hs){
 		square = Square(height, width, speed);
 		int sbrow = square.getstartrow() + height;
 		int sbcol = square.getstartcol();
 		scoreboard = Scoreboard(width, sbrow, sbcol);
-		highscore = hs;
 		initialize(p, v);
 	}
 	
@@ -149,7 +148,7 @@ public:
 				break;
 		}
 	}
-
+	
 	void update(){
 		createnextpiece(snake.nexthead());
 		

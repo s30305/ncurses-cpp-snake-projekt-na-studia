@@ -1,7 +1,6 @@
 #pragma once // program znajdzię się tylko w jednej kompilacji
 #include <ncursesw/curses.h>
 #include "Draw.hpp"
-#include "Ticks.hpp"
 
 class Square{
 public:
@@ -11,6 +10,23 @@ public:
 	
 	Square(int height, int width, int speed){
 		parameters(height, width, speed);
+	}
+	
+	void parameters(int height, int width, int speed){
+		int xres, yres;
+		getmaxyx(stdscr, yres, xres);
+		this->height = height;  
+		this->width = width;
+		
+		startrow = (yres / 2) - (height / 2);
+		startcol = (xres / 2) - (width / 2);
+		
+		win = newwin(height, width, startrow, startcol);
+		
+		timeout = speed;
+		settimeout(speed);
+		// strzałki są wyłączone by default
+		keypad(win, true);
 	}
 
 	void drawsquare(){
@@ -30,21 +46,8 @@ public:
 		mvwaddch(win, y, x, ch);
 	}
 	
-	chtype getinput(){
-		time_t time_last_input = Time::milliseconds();
-		
-		chtype input = wgetch(win);
-		chtype new_input = ERR;
-		
-		settimeout(0);
-		while(time_last_input + timeout >= Time::milliseconds()){
-			new_input = wgetch(win);
-		}
-		settimeout(timeout);
-		if(new_input != ERR)
-			input = new_input;
-			
-		return input;
+	chtype getinput(){			
+		return wgetch(win);
 	}
 	
 	void getcoordinates(int &y, int &x){
@@ -88,21 +91,4 @@ private:
 	WINDOW *win;
 	int height, width, startrow, startcol;
 	int timeout;
-	
-	void parameters(int height, int width, int speed){
-		int xres, yres;
-		getmaxyx(stdscr, yres, xres);
-		this->height = height;  
-		this->width = width;
-		
-		startrow = (yres / 2) - (height / 2);
-		startcol = (xres / 2) - (width / 2);
-		
-		win = newwin(height, width, startrow, startcol);
-		
-		timeout = speed;
-		settimeout(speed);
-		// strzałki są wyłączone by default
-		keypad(win, true);
-	}
 };
