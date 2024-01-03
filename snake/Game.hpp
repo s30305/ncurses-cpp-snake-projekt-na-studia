@@ -52,12 +52,12 @@ class Game{
 		apple = NULL;
 		score += 1;
 		if ((square.gettimeout() > 50))
-			square.changetimeout(square.gettimeout() - 5);
+			square.changetimeout(square.gettimeout() - 10);
 		scoreboard.updatescore(score);
 	}
 	
 public:
-	Game(int height, int width, int hs, bool p, bool v, int speed = 200) :highscore(hs){
+	Game(int height, int width, int hs, bool p, bool v, int speed = 300) :highscore(hs){
 		square = Square(height, width, speed);
 		int sbrow = square.getstartrow() + height;
 		int sbcol = square.getstartcol();
