@@ -1,36 +1,51 @@
 #include <iostream>
 #include <ncursesw/curses.h>
-#include "Square.hpp"
 #include "Game.hpp"
-#include "Draw.hpp"
+#include <stdlib.h>
 #include <fstream>
 #include <string>
+#ifdef _WIN32 
+#include <windows.h>
+#endif
 
+#define height 16
+#define width height*2
 //boję się wkładać polskie znaczki w kod, a polski bez znaczków to herezja thus wszystko po angielsku
 int loadhs(){
 	std::ifstream fin("highscore.txt");
-	int x;
-	fin >> x;
+	int score;
+	fin >> score;
 	fin.close();
-	return x;
+	return score;
 }
+
 void updatehs(int newhs){
 	std::ofstream fin("highscore.txt");
 	fin << newhs;
 	fin.close();
 }
-int main(int argc, char **argv){
-	int height = 16;
-	int width = height*2;
-	skok:;
-	int score, x;
-	int hs = loadhs();
-	bool plus = false;
-	bool vase = false;
-	a:;
+
+void initialize1(){
+	initscr();
+	noecho();
+	curs_set(0);
+	
+	#ifdef _WIN32
+	{
+		HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
+		DWORD mode;
+		GetConsoleMode(hStdin, &mode);
+		SetConsoleMode(hStdin, mode & ~(ENABLE_QUICK_EDIT_MODE | ENABLE_INSERT_MODE));
+	}
+	#endif
+}
+
+void pytanie1(bool & plus, bool & vase){
+	reset_pytania:;
 	std::cout << "Press 1 to select plain gamemode" << std::endl << "Press 2 to select + gamemode" << std::endl << "Press 3 to select vase gamemode" << std::endl;
-	std::cin >> x; 
-	switch(x){
+	int gamemode;
+	std::cin >> gamemode; 
+	switch(gamemode){
 		case 1:
 			break;
 		case 2:
@@ -41,14 +56,34 @@ int main(int argc, char **argv){
 			break;
 		default:
 			std::cout << "Invalid input, retry" << std::endl;
-			goto a;
+			goto reset_pytania;
 	}
+}
+
+bool pytanie2(int score, int highscore){
+	reset_pytania2:;
+	std::cout << "Game Over" << std::endl << "Score: " << score << std::endl << "HighScore: " << highscore << std::endl << "Do you want to continue playing? y/n" << std::endl;
+	char pytanie;
+	std::cin >> pytanie;
+	if(pytanie == 'y')
+		return true;
+	else if(pytanie != 'y' && pytanie != 'n'){
+		std::cout << "invalid input" << std::endl;
+		goto reset_pytania2;
+	}
+	else 
+		return false;
+}
+
+int main(int argc, char **argv){
+	reset_programu:;
+	bool plus = false;
+	bool vase = false;
+	int score;
+	int hs = loadhs();
 	
-	
-	initscr();
-	refresh();
-	noecho();
-	curs_set(0);
+	pytanie1(plus, vase);
+	initialize1();
 	
 	Game game(height, width, hs, plus, vase);
 	while(!game.isover()){
@@ -61,23 +96,16 @@ int main(int argc, char **argv){
 	}
 	
 	score = game.getscore();
-	if(hs < game.getscore()){
+	if(hs < game.getscore())
 		updatehs(game.getscore());
-	}
+		
 	if (!game.isexit())
 		endwin();
-		k:;
-		std::cout << "Game Over" << std::endl << "Score: " << score << std::endl << "HighScore: " << hs << std::endl << "Do you want to continue playing? y/n" << std::endl;
-		char y;
-		std::cin >> y;
-		if(y == 'y')
-			goto skok;
-		else if(y != 'y' && y != 'n'){
-			std::cout << "invalid input" << std::endl;
-			goto k;}
-		
+		if (pytanie2(score, hs) == true)
+			goto reset_programu;
 	
 	getch();
 	endwin();
+	refresh();
 	return 0;
 }
